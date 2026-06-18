@@ -1,6 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
+//componente reutilizable llamado MessageBubble para mostrar mensajes del chat
+//  Recibe el texto y un indicador que determina si el mensaje pertenece al usuario o al bot
+//  Según ese valor, aplica estilos condicionales para cambiar la posición de la burbuja 
+// (izquierda o derecha), el color de fondo y el color del texto
 export default function MessageBubble({ texto, esUsuario }) {
   return (
     <View style={[styles.fila, esUsuario ? styles.derecha : styles.izquierda]}>
