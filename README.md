@@ -90,7 +90,7 @@ Pinta cada mensaje a un lado u otro y con un color distinto según sea del usuar
 ## Clonar el repositorio
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone <git clone https://github.com/ValValNat/AsistenteOcio.git>
 cd AsistenteOcio
 ```
 
