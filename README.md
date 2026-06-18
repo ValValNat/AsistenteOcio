@@ -1,97 +1,263 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Asistente de Ocio y Cultura
 
-# Getting Started
+Aplicación móvil desarrollada en React Native que permite conversar con un asistente virtual especializado en actividades culturales y de ocio. El asistente entiende lenguaje natural, mantiene conversaciones con contexto y permite interactuar tanto por texto como por voz.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+# 1. Descripción del proyecto
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Objetivo
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+El objetivo de la aplicación es ofrecer un asistente conversacional al que el usuario pueda preguntar por planes de ocio y cultura (conciertos, teatro, cine, exposiciones, museos, etc.). El usuario puede escribir o hablar, y el asistente responde de forma coherente, además de leer la respuesta en voz alta.
 
-```sh
-# Using npm
-npm start
+El "cerebro" del asistente está construido con Dialogflow ES, que se encarga de entender lo que dice el usuario y de mantener el hilo de la conversación. La aplicación móvil es la interfaz que conecta con ese cerebro y añade el reconocimiento y la síntesis de voz.
 
-# OR using Yarn
-yarn start
+## Funcionalidades principales
+
+* Chat con un asistente virtual entrenado en Dialogflow ES.
+* Envío y recepción de mensajes en lenguaje natural.
+* Historial de la conversación con diferenciación visual entre los mensajes del usuario y los del asistente.
+* Reconocimiento de voz: el usuario puede hablar por el micrófono y su voz se convierte en texto.
+* Síntesis de voz: el asistente lee en voz alta sus respuestas.
+* Conversaciones de varios pasos en las que el asistente pregunta los datos que le faltan y recuerda lo dicho anteriormente.
+* Gestión de errores de conexión, respuestas vacías, fallos de reconocimiento de voz y fallos de reproducción de audio.
+
+---
+
+# 2. Tecnologías utilizadas
+
+* **React Native 0.85.3** como framework para la aplicación móvil.
+* **Dialogflow ES** como motor de comprensión del lenguaje natural y gestión del diálogo.
+
+## Librerías empleadas
+
+* **jsrsasign**: genera el token de autenticación necesario para comunicarse con la API de Dialogflow desde la aplicación.
+* **react-native-tts**: síntesis de voz (lectura en alto de las respuestas).
+* **expo-speech-recognition**: reconocimiento de voz, basado en el motor nativo de Android (*SpeechRecognizer*). Es un módulo compatible con la arquitectura nueva de React Native.
+* **react-native-safe-area-context**: ajuste de la interfaz a las zonas seguras de la pantalla.
+* **patch-package**: aplica pequeños parches a dependencias que lo necesitan.
+
+## Control de versiones
+
+* **Git**
+* **GitHub**
+
+---
+
+# 3. Estructura del proyecto
+
+```text
+AsistenteOcio/
+├── App.js
+├── index.js
+├── src/
+│   ├── components/
+│   │   └── MessageBubble.js
+│   ├── config/
+│   │   └── dialogflowConfig.js
+│   ├── services/
+│   │   └── dialogflowService.js
+│   └── screens/
+│       └── ChatScreen.js
+├── patches/
+└── android/
 ```
 
-## Step 2: Build and run your app
+## Componentes principales
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### dialogflowService.js
 
-### Android
+Obtiene un token de acceso a partir de la cuenta de servicio (firmando un JWT con **jsrsasign**) y envía el texto del usuario al método **detectIntent** de Dialogflow, devolviendo la respuesta del asistente.
 
-```sh
-# Using npm
-npm run android
+### ChatScreen.js
 
-# OR using Yarn
-yarn android
+Gestiona el estado de la conversación, dibuja el historial con **FlatList**, controla el campo de texto y el botón de envío, e integra el reconocimiento de voz (**expo-speech-recognition**) y la síntesis de voz (**react-native-tts**).
+
+### MessageBubble.js
+
+Pinta cada mensaje a un lado u otro y con un color distinto según sea del usuario o del asistente.
+
+---
+
+# 4. Instalación y ejecución
+
+## Requisitos previos
+
+* Node.js 22 o superior.
+* Entorno de desarrollo de React Native para Android configurado (JDK, Android SDK y adb).
+* Un dispositivo Android físico con la depuración USB activada o un emulador.
+
+## Clonar el repositorio
+
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd AsistenteOcio
 ```
 
-### iOS
+## Instalar las dependencias
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```bash
+npm install
 ```
 
-Then, and every time you update your native dependencies, run:
+## Configurar las credenciales de Dialogflow
 
-```sh
-bundle exec pod install
+El archivo `src/config/dialogflowConfig.js` **no se incluye en el repositorio por seguridad**.
+
+Debe crearse manualmente con el contenido de la cuenta de servicio de Google:
+
+```javascript
+export const SERVICE_ACCOUNT = {
+  // Contenido del archivo JSON de la cuenta de servicio
+};
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## Ejecutar la aplicación
 
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+```bash
+npx react-native run-android
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+---
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+# 5. Agente conversacional
 
-## Step 3: Modify your app
+El agente está creado en **Dialogflow ES**, con idioma español y especializado en ocio y cultura.
 
-Now that you have successfully run the app, let's make changes!
+## Intents
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+El agente incluye nueve intents:
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+1. Default Welcome Intent
+2. Default Fallback Intent
+3. RecomendarPlan
+4. Despedida
+5. Agradecimiento
+6. ConsultarHorario
+7. BuscarActividad
+8. ReservarEntradas
+9. ConsultarPrecio
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+Cada intent cuenta con un mínimo de quince frases de entrenamiento.
 
-## Congratulations! :tada:
+## Entidades
 
-You've successfully run and modified your React Native App. :partying_face:
+### @tipo_actividad
 
-### Now what?
+* concierto
+* teatro
+* cine
+* exposición
+* museo
+* festival
+* danza
+* monólogo
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+### @ciudad
 
-# Troubleshooting
+* Sevilla
+* Madrid
+* Granada
+* Málaga
+* Córdoba
+* Barcelona
+* Valencia
+* Cádiz
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+### @momento_dia
 
-# Learn More
+* mañana
+* tarde
+* noche
+* fin de semana
 
-To learn more about React Native, take a look at the following resources:
+## Contextos y flujos de varios pasos
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+### Buscar actividad
+
+Si el usuario no indica el tipo o la ciudad, el asistente los pregunta antes de responder.
+
+### Reservar entradas
+
+El asistente pregunta para qué actividad y para cuántas personas.
+
+### Consultar precio
+
+Mediante el contexto `actividad-encontrada`, el asistente recuerda la actividad y la ciudad de la búsqueda anterior, permitiendo preguntas como:
+
+> ¿Cuánto cuesta?
+
+sin repetir los datos.
+
+## Ejemplos de entrenamiento
+
+* "Recomiéndame un plan para esta tarde."
+* "Busca un concierto en Sevilla."
+* "Quiero reservar dos entradas para el teatro."
+* "¿A qué hora abren los museos?"
+* "¿Cuánto cuesta?"
+
+---
+
+# 6. Manual de usuario
+
+El funcionamiento detallado de la aplicación, acompañado de capturas de pantalla, se encuentra en:
+
+```text
+manual_de_usuario.pdf
+```
+
+---
+
+# 7. Incidencias y soluciones
+
+## Cuota de proyectos en Dialogflow
+
+Al crear el agente apareció un error de cuota de proyectos.
+
+**Solución:** utilizar una cuenta personal de Google en lugar de una cuenta restringida.
+
+## Errores de Gradle con jcenter
+
+La primera librería de voz utilizada (`@react-native-voice/voice`) y `react-native-tts` dependían de **jcenter**, repositorio ya retirado.
+
+**Solución:** sustituirlo por **mavenCentral** y conservar el cambio mediante **patch-package**.
+
+## Módulo de voz nulo
+
+Aparecía:
+
+```javascript
+NativeModules.Voice = null
+```
+
+porque `@react-native-voice/voice` no era compatible con la arquitectura nueva de React Native.
+
+**Solución:** abandonar dicha librería.
+
+## Cambio a expo-speech-recognition
+
+Se sustituyó la librería anterior por **expo-speech-recognition**, compatible con TurboModules y con la nueva arquitectura.
+
+## Ajuste de versión de React Native
+
+Los módulos de Expo requerían React Native 0.85 mientras que el proyecto estaba inicialmente en una versión superior.
+
+**Solución:** alinear el proyecto a **React Native 0.85.3**.
+
+## Restricciones de instalación en Xiaomi
+
+El dispositivo bloqueaba la instalación por USB.
+
+**Solución:** activar:
+
+* Instalar vía USB.
+* Depuración USB (ajustes de seguridad).
+
+dentro de las opciones de desarrollador.
+
+---
+
+# Autor
+
+Proyecto académico desarrollado como práctica de integración de tecnologías de procesamiento del lenguaje natural, interfaces móviles y reconocimiento de voz utilizando React Native y Dialogflow ES por Natividad V. V. 
